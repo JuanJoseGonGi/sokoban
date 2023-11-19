@@ -65,7 +65,7 @@ Sokoban is a classic puzzle game originating from Japan. The player (or in our c
 
 ## Documentation
 
-Detailed documentation on the usage, modules, and other aspects of the project can be found [here](link-to-your-documentation).
+Detailed documentation on the usage, modules, and other aspects of the project can be found [here](./DOCUMENTATION.md).
 
 ## Testing
 
