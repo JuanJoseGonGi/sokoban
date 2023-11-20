@@ -25,7 +25,7 @@ def addNodesToPQ(graph,node,pq,visited,heuristic_values,weight=0,current=""):
             pq.append([i[0],weight+i[1]+heuristic_values[node],node+","+str(current)])
         visited.append(node)
 
-def ucs(graph,start,goal,heuristic_values):
+def a_star(graph,start,goal,heuristic_values):
     try:
         graph[start]
         graph[goal]
@@ -49,7 +49,6 @@ def ucs(graph,start,goal,heuristic_values):
             print(current)
             # print(current[2].split(",")[:-1][::-1])
             return current[2].split(",")[:-1][::-1]#return the path in order
-            return 
     
     print("path not found")
          
@@ -81,4 +80,4 @@ if __name__ == "__main__":
     # A = [[0,55,2],[0,2,3],[3,1,4]]
     # updatePriorities(A)
     # print(A)
-    ucs(graph,"S","G1",heuristic_values)
+    a_star(graph,"S","G1",heuristic_values)

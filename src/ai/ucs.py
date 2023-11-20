@@ -1,3 +1,5 @@
+from src.logic.sokoban import Sokoban
+
 def updatePriorities(pq):
     bubbleSortByWeight(pq)
 
@@ -18,6 +20,8 @@ def addNodesToPQ(graph,node,pq,visited,weight=0,current=""):
         for i in graph[node]:
             pq.append([i[0],weight+i[1],node+","+str(current)])
         visited.append(node)
+
+# def dfs(model: Sokoban, origin: tuple[int, int], destination: tuple[int, int]):
 
 def ucs(graph,start,goal):
     try:
