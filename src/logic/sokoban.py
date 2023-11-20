@@ -75,7 +75,12 @@ class Sokoban(Model):
         return self.grid.get_cell_list_contents([position])
 
     def is_valid_position(self, position: tuple[int, int]) -> bool:
-        if position[0] < 0 or position[0] >= self.grid.width:
+        if (
+            position[0] < 0
+            or position[0] >= self.grid.width
+            or position[1] < 0
+            or position[1] >= self.grid.height
+        ):
             return False
 
         agents = self.get_position_agents(position)

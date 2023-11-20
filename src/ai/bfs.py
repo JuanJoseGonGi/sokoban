@@ -9,7 +9,7 @@ def bfs(model, origin: tuple[int, int], destination: tuple[int, int]):
     origin to the destination.
     """
     visited_positions = []
-    path = set()
+    path: set[tuple[int, int]] = set()
 
     def bfs_recursive(
         origin: tuple[int, int],

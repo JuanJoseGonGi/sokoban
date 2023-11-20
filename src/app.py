@@ -9,7 +9,7 @@ from src.data.map_loader import MapLoader
 
 loader = MapLoader()
 map_structure, width, height = loader.get_map_structure(
-    path.join(path.dirname(__file__), "data/samples/map1.txt")
+    path.join(path.dirname(__file__), "data/samples/map2.txt")
 )
 
 portrayal_router = PortrayalRouter()
