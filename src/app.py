@@ -1,5 +1,5 @@
 from mesa.visualization.ModularVisualization import ModularServer
-from mesa.visualization import CanvasGrid
+import mesa
 from os import path
 
 from src.ui.visualization.portrayal_router import PortrayalRouter
@@ -12,7 +12,7 @@ map_structure, width, height = loader.get_map_structure(
 )
 
 portrayal_router = PortrayalRouter()
-grid = CanvasGrid(
+grid = mesa.visualization.CanvasGrid(
     portrayal_router.get_portrayal, width, height, width * 50, height * 50
 )
 server = ModularServer(
