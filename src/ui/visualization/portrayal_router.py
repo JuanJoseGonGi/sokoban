@@ -18,7 +18,7 @@ class PortrayalRouter:
         if agent.pos in self.search_path:
             text = self.search_path.index(agent.pos)
 
-        portrayal = {"text": text, "text_color": "#00FFFF", "Color": "#00FFFF"}
+        portrayal = {"text": text, "text_color": "#000000", "Color": "#000000"}
 
         if isinstance(agent, Box):
             portrayal.update(self.get_box_portrayal(agent))

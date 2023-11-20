@@ -139,7 +139,7 @@ class Sokoban(Model):
             return visited
         if self.algorithm_name == "Beam Search":
             visited, _ = beam_search(
-                self, self.heuristic_function(), 3, self.origin, self.destination
+                self, self.heuristic_function(), 2, self.origin, self.destination
             )
             return visited
         if self.algorithm_name == "A*":

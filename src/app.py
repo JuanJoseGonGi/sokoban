@@ -35,10 +35,10 @@ server = ModularServer(
             "Manhattan Distance",
             ["Manhattan Distance", "Euclidean Distance"],
         ),
-        "origin_0": NumberInput("Origin X", 1),
-        "origin_1": NumberInput("Origin Y", 1),
-        "destination_0": NumberInput("Destination X", 2),
-        "destination_1": NumberInput("Destination Y", 4),
+        "origin_0": NumberInput("Origin X", 0),
+        "origin_1": NumberInput("Origin Y", 4),
+        "destination_0": NumberInput("Destination X", 6),
+        "destination_1": NumberInput("Destination Y", 2),
     },
 )
 
