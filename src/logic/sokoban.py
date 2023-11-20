@@ -11,7 +11,10 @@ from src.ui.visualization.portrayal_router import PortrayalRouter
 
 from src.ai.dfs import dfs
 from src.ai.bfs import bfs
+from src.ai.ucs import ucs
 from src.ai.beam_search import beam_search
+from src.ai.a_star import a_star
+from src.ai.hill_climb import hill_climb
 
 
 class Sokoban(Model):
@@ -98,6 +101,11 @@ class Sokoban(Model):
                 valid_neighbors.append(neighbor)
         return valid_neighbors
 
+    def get_valid_move_neighbors_and_costs(self, position: tuple[int, int]):
+        neighbors = self.get_valid_move_neighbors(position)
+        costs = [1] * len(neighbors)
+        return neighbors, costs
+
     def heuristic_function(self):
         if self.heuristic_function_name == "Manhattan Distance":
             return lambda position, destination: abs(
@@ -121,16 +129,23 @@ class Sokoban(Model):
         if self.algorithm_name == "BFS":
             visited, _ = bfs(self, self.origin, self.destination)
             return visited
+        if self.algorithm_name == "UCS":
+            visited, _ = ucs(self, self.origin, self.destination)
+            return visited
         if self.algorithm_name == "Beam Search":
             visited, _ = beam_search(
                 self, self.heuristic_function(), 3, self.origin, self.destination
             )
             return visited
         if self.algorithm_name == "A*":
-            # TODO
-            raise NotImplementedError
+            visited, _ = a_star(
+                self, self.origin, self.destination, self.heuristic_function()
+            )
+            return visited
         if self.algorithm_name == "Hill Climbing":
-            # TODO
-            raise NotImplementedError
+            visited, _ = hill_climb(
+                self, self.origin, self.destination, self.heuristic_function()
+            )
+            return visited
 
         raise NotImplementedError

@@ -25,7 +25,11 @@ server = ModularServer(
         "width": width,
         "height": height,
         "portrayal_router": portrayal_router,
-        "algorithm_name": Choice("Algorithm", "DFS", ["DFS", "BFS", "Beam Search"]),
+        "algorithm_name": Choice(
+            "Algorithm",
+            "DFS",
+            ["DFS", "BFS", "UCS", "Beam Search", "A*", "Hill Climbing"],
+        ),
         "heuristic_function_name": Choice(
             "Heuristic Function",
             "Manhattan Distance",
