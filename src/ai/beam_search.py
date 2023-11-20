@@ -20,6 +20,7 @@ def beam_search(
         new_beam = []
         for position, path in beam:
             if position == destination:
+                visited_positions.append(position)
                 return visited_positions, path + [destination]
 
             # Add the current position to the visited set
