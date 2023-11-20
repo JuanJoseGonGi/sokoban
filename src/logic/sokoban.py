@@ -45,3 +45,33 @@ class Sokoban(Model):
     def step(self):
         pass
         # self.schedule.step()
+
+    def get_position_agents(self, position: tuple[int, int]):
+        return self.grid.get_cell_list_contents([position])
+
+    def is_valid_position(self, position: tuple[int, int]) -> bool:
+        if position[0] < 0 or position[0] >= self.grid.width:
+            return False
+
+        agents = self.get_position_agents(position)
+        for agent in agents:
+            if isinstance(agent, Box) or isinstance(agent, Rock):
+                return False
+
+        return True
+
+    def get_valid_move_neighbors(
+        self, position: tuple[int, int]
+    ) -> list[tuple[int, int]]:
+        """It returns the neighbors of a position following the left -> up -> right -> down order."""
+        neighbors = [
+            (position[0] - 1, position[1]),
+            (position[0], position[1] - 1),
+            (position[0] + 1, position[1]),
+            (position[0], position[1] + 1),
+        ]
+        valid_neighbors = []
+        for neighbor in neighbors:
+            if self.is_valid_position(neighbor):
+                valid_neighbors.append(neighbor)
+        return valid_neighbors
