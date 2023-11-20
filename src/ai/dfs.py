@@ -1,7 +1,4 @@
-from src.logic.sokoban import Sokoban
-
-
-def dfs(model: Sokoban, origin: tuple[int, int], destination: tuple[int, int]):
+def dfs(model, origin: tuple[int, int], destination: tuple[int, int]):
     """Recursive implementation of DFS.
 
     It receives a model, an origin, and a destination, and returns a list
