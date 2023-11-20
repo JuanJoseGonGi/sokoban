@@ -1,8 +1,7 @@
-from src.logic.sokoban import Sokoban
 from collections import deque
 
 
-def bfs(model: Sokoban, origin: tuple[int, int], destination: tuple[int, int]):
+def bfs(model, origin: tuple[int, int], destination: tuple[int, int]):
     """Recursive implementation of BFS.
 
     It receives a model, an origin, and a destination, and returns a list

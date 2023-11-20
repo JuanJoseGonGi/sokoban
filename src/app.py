@@ -1,5 +1,6 @@
+import mesa
 from mesa.visualization.ModularVisualization import ModularServer
-from mesa.visualization import CanvasGrid
+from mesa.visualization.UserParam import Choice, NumberInput
 from os import path
 
 from src.ui.visualization.portrayal_router import PortrayalRouter
@@ -12,14 +13,29 @@ map_structure, width, height = loader.get_map_structure(
 )
 
 portrayal_router = PortrayalRouter()
-grid = CanvasGrid(
+grid = mesa.visualization.CanvasGrid(
     portrayal_router.get_portrayal, width, height, width * 50, height * 50
 )
 server = ModularServer(
     Sokoban,
     [grid],
     "Sokoban",
-    {"map_structure": map_structure, "width": width, "height": height},
+    {
+        "map_structure": map_structure,
+        "width": width,
+        "height": height,
+        "portrayal_router": portrayal_router,
+        "algorithm_name": Choice("Algorithm", "DFS", ["DFS", "BFS", "Beam Search"]),
+        "heuristic_function_name": Choice(
+            "Heuristic Function",
+            "Manhattan Distance",
+            ["Manhattan Distance", "Euclidean Distance"],
+        ),
+        "origin_0": NumberInput("Origin X", 1),
+        "origin_1": NumberInput("Origin Y", 1),
+        "destination_0": NumberInput("Destination X", 2),
+        "destination_1": NumberInput("Destination Y", 4),
+    },
 )
 
 if __name__ == "__main__":

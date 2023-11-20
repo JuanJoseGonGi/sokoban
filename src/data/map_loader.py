@@ -28,20 +28,31 @@ class MapLoader:
             if width < len(map_file_row_agents):
                 width = len(map_file_row_agents)
             height += 1
+            y_pos = len(map_file) - y - 1
             for x, map_file_cell_agents in enumerate(map_file_row_agents):
                 map_file_agents = map_file_cell_agents.split("-", 1)
                 for map_file_agent in map_file_agents:
                     upper_map_file_agent = map_file_agent.upper()
                     if upper_map_file_agent == "C":
-                        map_structure["paths"].append((upper_map_file_agent, (x, y)))
+                        map_structure["paths"].append(
+                            (upper_map_file_agent, (x, y_pos))
+                        )
                     elif upper_map_file_agent == "R":
-                        map_structure["rocks"].append((upper_map_file_agent, (x, y)))
+                        map_structure["rocks"].append(
+                            (upper_map_file_agent, (x, y_pos))
+                        )
                     elif upper_map_file_agent == "M":
-                        map_structure["goals"].append((upper_map_file_agent, (x, y)))
+                        map_structure["goals"].append(
+                            (upper_map_file_agent, (x, y_pos))
+                        )
                     elif "B" in upper_map_file_agent:
-                        map_structure["boxes"].append((upper_map_file_agent, (x, y)))
+                        map_structure["boxes"].append(
+                            (upper_map_file_agent, (x, y_pos))
+                        )
                     elif "A" in upper_map_file_agent:
-                        map_structure["robots"].append((upper_map_file_agent, (x, y)))
+                        map_structure["robots"].append(
+                            (upper_map_file_agent, (x, y_pos))
+                        )
                     else:
                         raise Exception(
                             f"Unknown map file agent: {upper_map_file_agent}"
