@@ -1,4 +1,4 @@
-from collections import deque
+import heapq
 
 
 def ucs(model, origin, destination):
@@ -9,20 +9,21 @@ def ucs(model, origin, destination):
             total_path.append(current)
         return total_path[::-1]
 
-    queue: deque[tuple[int, tuple[int, int]]] = deque([(0, origin)])
+    open_set = []
+    heapq.heappush(open_set, (0, origin))
 
     came_from = {}
     cost_so_far = {origin: 0}
     visited = []  # Conjunto de nodos visitados
     explored = []  # Conjunto de nodos explorados
 
-    while queue:
-        current_cost, current = queue.pop()
+    while open_set:
+        current_cost, current = heapq.heappop(open_set)
 
         if current == destination:
             path = reconstruct_path(came_from, current)
             visited.append(current)
-            return list(visited), path  # Retorna las posiciones visitadas y la ruta
+            return visited, path  # Retorna las posiciones visitadas y la ruta
 
         if current not in explored:
             explored.append(current)
@@ -33,7 +34,8 @@ def ucs(model, origin, destination):
                 if neighbor not in cost_so_far or new_cost < cost_so_far[neighbor]:
                     cost_so_far[neighbor] = new_cost
                     priority = new_cost
-                    queue.appendleft((priority, neighbor))
+
+                    heapq.heappush(open_set, (priority, neighbor))
                     came_from[neighbor] = current
 
-    return list(visited), []
+    return visited, []
