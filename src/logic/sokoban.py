@@ -16,6 +16,8 @@ from src.ai.beam_search import beam_search
 from src.ai.a_star import a_star
 from src.ai.hill_climb import hill_climb
 
+import pickle
+
 
 class Sokoban(Model):
     def __init__(
@@ -64,12 +66,12 @@ class Sokoban(Model):
 
         self.portrayal_router.search_path = self.search_path()
 
-        # for agent in self.agents:
-        #     self.schedule.add(agent)
+        for agent in self.agents:
+            self.schedule.add(agent)
 
     def step(self):
-        pass
-        # self.schedule.step()
+        #pass
+        self.schedule.step()
 
     def get_position_agents(self, position: tuple[int, int]):
         return self.grid.get_cell_list_contents([position])
@@ -136,6 +138,13 @@ class Sokoban(Model):
             return visited
         if self.algorithm_name == "UCS":
             visited, _ = ucs(self, self.origin, self.destination)
+
+            print(_)#la ruta
+
+            #guardar la ruta de los nodos que debe visitar en orden
+            with open('src/data/path.pkl', 'wb') as f:
+                pickle.dump(_, f)
+
             return visited
         if self.algorithm_name == "Beam Search":
             visited, _ = beam_search(
