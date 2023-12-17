@@ -27,7 +27,7 @@ server = ModularServer(
         "portrayal_router": portrayal_router,
         "algorithm_name": Choice(
             "Algorithm",
-            "UCS",
+            "Hill Climbing",
             ["DFS", "BFS", "UCS", "Beam Search", "A*", "Hill Climbing"],
         ),
         "heuristic_function_name": Choice(
@@ -35,10 +35,20 @@ server = ModularServer(
             "Manhattan Distance",
             ["Manhattan Distance", "Euclidean Distance"],
         ),
+
+        #map3.txt
         "origin_0": NumberInput("Origin X", 2),
-        "origin_1": NumberInput("Origin Y", 4),
+        "origin_1": NumberInput("Origin Y", 3),
+
         "destination_0": NumberInput("Destination X", 6),
-        "destination_1": NumberInput("Destination Y", 5),
+        "destination_1": NumberInput("Destination Y", 1),
+
+        #map4.txt
+        # "origin_0": NumberInput("Origin X", 6),
+        # "origin_1": NumberInput("Origin Y", 6),
+        #
+        # "destination_0": NumberInput("Destination X", 0),
+        # "destination_1": NumberInput("Destination Y", 2),
     },
 )
 

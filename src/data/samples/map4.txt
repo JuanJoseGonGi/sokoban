@@ -1,0 +1,7 @@
+C,  R,  C,  R,  C,  C,  B,  C-a-1
+C,  C,  C,  C,  C,  C,  C,  R
+C,  C,  C,  R,  C,  C,  C,  R
+R,  C,  C,  C,  C,  C,  C,  C
+M,  C,  C,  C,  C,  C,  C,  C
+C,  C,  R,  C,  C,  C,  C,  C
+C,  C,  R,  C,  C,  C,  C,  C

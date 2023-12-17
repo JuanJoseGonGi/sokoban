@@ -129,37 +129,61 @@ class Sokoban(Model):
 
         raise NotImplementedError
 
+    def save_route(self,_):
+        #guardar la ruta de los nodos que debe visitar en orden
+        with open('src/data/path.pkl', 'wb') as f:
+            pickle.dump(_, f)
+
     def search_path(self) -> list[tuple[int, int]]:
         if self.algorithm_name == "DFS":
             visited, _ = dfs(self, self.origin, self.destination)
+
+            print(_)#la ruta
+            self.save_route(_)
+
             return visited
         if self.algorithm_name == "BFS":
             visited, _ = bfs(self, self.origin, self.destination)
+
+            print(_)#la ruta
+            self.save_route(_)
+
             return visited
         if self.algorithm_name == "UCS":
             visited, _ = ucs(self, self.origin, self.destination)
 
             print(_)#la ruta
-
-            #guardar la ruta de los nodos que debe visitar en orden
-            with open('src/data/path.pkl', 'wb') as f:
-                pickle.dump(_, f)
+            self.save_route(_)
 
             return visited
         if self.algorithm_name == "Beam Search":
             visited, _ = beam_search(
                 self, self.heuristic_function(), 2, self.origin, self.destination
             )
+
+            print(_)#la ruta
+            if len(_)>0:
+                self.save_route(_)
+
             return visited
         if self.algorithm_name == "A*":
             visited, _ = a_star(
                 self, self.origin, self.destination, self.heuristic_function()
             )
+
+            print(_)#la ruta
+            if len(_)>0:
+                self.save_route(_)
+
             return visited
         if self.algorithm_name == "Hill Climbing":
             visited, _ = hill_climb(
                 self, self.origin, self.destination, self.heuristic_function()
             )
+
+            print(_)#la ruta
+            self.save_route(_)
+
             return visited
 
         raise NotImplementedError

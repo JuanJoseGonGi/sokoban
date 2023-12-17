@@ -18,7 +18,9 @@ def beam_search(
         new_beam = []
         for position, path in beam:
             visited_positions.append(position)
+
             if position == destination:
+                #si encontro camino
                 return visited_positions, path
 
             valid_neighbors = model.get_valid_move_neighbors(position)

@@ -1,7 +1,7 @@
 C,  R,  C,  R,  C,  C,  C,  R
-C,  C,  C,  C,  C,  C,  M,  R
+C,  C,  C,  C,  R,  R,  R,  R
 C,  C,  C,  R,  C,  C,  C,  R
-R,  C,  B,  C,  C,  C,  C,  C
-C,  C,  C-a-1,  C,  C,  C,  C,  C
-C,  C,  R,  C,  C,  C,  C,  C
+C,  C,  B,  C,  C,  C,  C,  R
+C,  C,  C-a-1,  C,  C,  C,  C,  R
+C,  C,  R,  C,  C,  C,  M,  R
 C,  C,  R,  C,  C,  C,  C,  C
