@@ -67,5 +67,5 @@ class MapLoader:
 
 if __name__ == "__main__":
     loader = MapLoader()
-    map_structure, width, height = loader.get_map_structure("samples/map1.txt")
+    map_structure, width, height = loader.get_map_structure("samples/map2.txt")
     print(map_structure, width, height)

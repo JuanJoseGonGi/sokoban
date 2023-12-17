@@ -1,6 +1,5 @@
 import heapq
 
-
 def ucs(model, origin, destination):
     def reconstruct_path(came_from, current):
         total_path = [current]
@@ -37,5 +36,4 @@ def ucs(model, origin, destination):
 
                     heapq.heappush(open_set, (priority, neighbor))
                     came_from[neighbor] = current
-
-    return visited, []
+    return visited, path

@@ -29,5 +29,5 @@ def bfs(model, origin: tuple[int, int], destination: tuple[int, int]):
             if neighbor not in visited_positions and neighbor not in queue:
                 queue.append(neighbor)
                 came_from[neighbor] = current
-
-    return visited_positions, []
+    #print(path)
+    return visited_positions, path

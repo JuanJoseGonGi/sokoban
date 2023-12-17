@@ -9,7 +9,7 @@ from src.data.map_loader import MapLoader
 
 loader = MapLoader()
 map_structure, width, height = loader.get_map_structure(
-    path.join(path.dirname(__file__), "data/samples/map2.txt")
+    path.join(path.dirname(__file__), "data/samples/map3.txt")
 )
 
 portrayal_router = PortrayalRouter()
@@ -27,7 +27,7 @@ server = ModularServer(
         "portrayal_router": portrayal_router,
         "algorithm_name": Choice(
             "Algorithm",
-            "DFS",
+            "UCS",
             ["DFS", "BFS", "UCS", "Beam Search", "A*", "Hill Climbing"],
         ),
         "heuristic_function_name": Choice(
@@ -35,10 +35,10 @@ server = ModularServer(
             "Manhattan Distance",
             ["Manhattan Distance", "Euclidean Distance"],
         ),
-        "origin_0": NumberInput("Origin X", 0),
+        "origin_0": NumberInput("Origin X", 2),
         "origin_1": NumberInput("Origin Y", 4),
         "destination_0": NumberInput("Destination X", 6),
-        "destination_1": NumberInput("Destination Y", 2),
+        "destination_1": NumberInput("Destination Y", 5),
     },
 )
 
