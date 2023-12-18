@@ -1,45 +1,50 @@
-from typing import Callable
+from typing import Callable, List, Tuple
 
 
 def dfs(
-    origin: tuple[int, int],
-    destination: tuple[int, int],
-    order: tuple[str, str, str, str],
-    is_valid_move_fn: Callable[[tuple[int, int], tuple[str, str, str, str]], list],
-):
-    visited_positions = []
-    path = []
-
-    def dfs_recursive(current: tuple[int, int]):
-        if current in visited_positions:
-            return False
-
-        visited_positions.append(current)
+    origin: Tuple[int, int],
+    destination: Tuple[int, int],
+    order: Tuple[str, str, str, str],
+    is_valid_move_fn: Callable[
+        [Tuple[int, int], Tuple[str, str, str, str]], List[Tuple[int, int]]
+    ],
+) -> Tuple[List[Tuple[int, int]], List[Tuple[int, int]]]:
+    def dfs_recursive(
+        current: Tuple[int, int],
+        visited: List[Tuple[int, int]],
+        path: List[Tuple[int, int]],
+    ) -> bool:
         if current == destination:
             path.append(current)
             return True
 
+        visited.append(current)
+
         for neighbor in is_valid_move_fn(current, order):
-            if dfs_recursive(neighbor):
+            if neighbor not in visited and dfs_recursive(neighbor, visited, path):
                 path.append(current)
                 return True
 
         return False
 
-    dfs_recursive(origin)
+    visited_positions = []
+    path = []
+    dfs_recursive(origin, visited_positions, path)
 
-    if len(path) == 0:
-        return visited_positions, []
+    if not path:
+        return list(visited_positions), []
 
-    # Calcular la columna más repetida en el path
+    # Reverse the path to start from the origin
+    path = path[::-1]
+
+    # Counting column occurrences
     col_count: dict[int, int] = {}
-    for pos in reversed(path):
-        col = pos[1]  # Asumiendo que la columna es el segundo elemento de la tupla
+    for pos in path:
+        col = pos[1]  # Assuming the column is the second element of the tuple
         col_count[col] = col_count.get(col, 0) + 1
 
-    # Encontrar la columna con más repeticiones
+    # Finding the column with the most occurrences
     largest_col_key = max(col_count, key=lambda k: col_count[k])
+    print("Column with most occurrences: " + str(largest_col_key))
 
-    print("Columna con más repeticiones: " + str(largest_col_key))
-
-    return visited_positions, list(reversed(path))
+    return list(visited_positions), path

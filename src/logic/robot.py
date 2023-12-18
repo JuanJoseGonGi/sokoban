@@ -1,6 +1,8 @@
 from mesa import Agent
 from mesa.space import Coordinate
 
+from src.ai.a_star import a_star
+
 from typing import Optional
 
 ROBOT_ORDER = ("left", "up", "right", "down")
@@ -23,27 +25,30 @@ class Robot(Agent):
             return
 
         if self.pos == self.destination:
-            self.destination = None
-            self.requester_box = None
             return
 
-        _, path = self.model.get_path(
+        _, path = a_star(
             self.pos,
             self.destination,
+            self.model.heuristic_function(),
             ROBOT_ORDER,
             self.model.get_valid_move_neighbors,
         )
 
-        next_position = path.pop(0)
-        while len(path) > 0 and self.pos == next_position:
+        next_position = None
+        while len(path) > 0 and (self.pos == next_position or next_position is None):
             next_position = path.pop(0)
 
-        if next_position != self.pos:
-            self.model.move_agent(self, next_position)
-            return
-
-        self.destination = None
-        self.requester_box = None
+        if next_position is not None and next_position != self.pos:
+            self.model.move_robot(self, next_position)
 
     def is_valid_move(self, next_position):
         return self.model.is_valid_robot_position(next_position)
+
+    def find_box(self, box, pos):
+        self.requester_box = box
+        self.destination = pos
+
+    def stop_finding(self):
+        self.requester_box = None
+        self.destination = None

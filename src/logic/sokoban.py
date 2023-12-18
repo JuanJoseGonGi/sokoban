@@ -20,7 +20,7 @@ from src.ai.search_tree.tree import Tree, TreeNode
 from src.data.map_loader import MapLoader
 
 import os
-from typing import Callable, Union, Optional
+from typing import Callable, Optional
 
 ROBOT_ORDER = ("left", "up", "right", "down")
 BOX_ORDER = ("down", "up", "left", "right")
@@ -78,6 +78,8 @@ class Sokoban(Model):
             self.running = False
             return
 
+        print(f"Cost: {self.get_cost()}")
+
         self.schedule.step()
 
     def get_position_agents(self, position: Coordinate):
@@ -113,8 +115,12 @@ class Sokoban(Model):
             if robot.pos is None:
                 continue
 
-            _, path = self.get_path(
-                robot.pos, position, ROBOT_ORDER, self.get_valid_move_neighbors
+            _, path = a_star(
+                robot.pos,
+                position,
+                self.heuristic_function(),
+                ROBOT_ORDER,
+                self.get_valid_move_neighbors,
             )
             if len(path) == 0:
                 continue
@@ -183,7 +189,7 @@ class Sokoban(Model):
 
     def is_valid_box_move(self, position: Coordinate, new_position: Coordinate) -> bool:
         if position == new_position:
-            return True
+            return False
 
         opposite = self.get_opposite_position(position, new_position)
         return self.is_valid_box_position(
@@ -204,14 +210,14 @@ class Sokoban(Model):
 
     def heuristic_function(self):
         if self.heuristic_function_name == "Manhattan Distance":
-            return lambda position, destination: abs(
-                position[0] - destination[0]
-            ) + abs(position[1] - destination[1])
+            return lambda origin, destination: abs(origin[0] - destination[0]) + abs(
+                origin[1] - destination[1]
+            )
         if self.heuristic_function_name == "Euclidean Distance":
             return (
-                lambda position, destination: (
-                    (position[0] - destination[0]) ** 2
-                    + (position[1] - destination[1]) ** 2
+                lambda origin, destination: (
+                    (origin[0] - destination[0]) ** 2
+                    + (origin[1] - destination[1]) ** 2
                 )
                 ** 0.5
             )
@@ -257,58 +263,78 @@ class Sokoban(Model):
 
         raise NotImplementedError
 
-    def move_agent(
-        self, agent: Union[Robot, Box], position: Coordinate, teleport_box_robot=False
-    ) -> bool:
-        if agent.pos == position:
+    def move_robot(self, robot: Robot, position: Coordinate) -> bool:
+        if robot.pos == position:
             return True
 
-        if isinstance(agent, Robot) and not self.is_valid_robot_position(position):
+        if robot.pos is None:
+            raise Exception(f"Agent {robot.name} position is None")
+
+        if not self.is_valid_robot_position(position):
             return False
 
-        if isinstance(agent, Robot):
-            self.grid.move_agent(agent, position)
+        self.grid.move_agent(robot, position)
+        return True
+
+    def move_box(self, box: Box, position: Coordinate) -> bool:
+        if box.pos == position:
             return True
 
-        if agent.pos is None:
-            raise Exception(f"Agent {agent.name} position is None")
+        if box.pos is None:
+            raise Exception(f"Agent {box.name} position is None")
 
-        if not self.is_valid_box_move(agent.pos, position):
+        opposite = self.get_opposite_position(box.pos, position)
+
+        print(f"Moving box {box.name} from {box.pos} to {position}")
+
+        if not self.is_valid_box_move(box.pos, position):
+            if not self.has_robot_at(position):
+                return False
+
+            agents = self.get_position_agents(position)
+            for agent in agents:
+                if not isinstance(agent, Robot):
+                    continue
+
+                if agent.pos is None:
+                    continue
+
+                neighbors = self.grid.get_neighborhood(agent.pos, moore=False)
+                for neighbor in neighbors:
+                    if self.is_valid_robot_position(neighbor):
+                        self.grid.move_agent(agent, neighbor)
+                        break
+
             return False
 
-        opposite = self.get_opposite_position(agent.pos, position)
-        if agent.requested_robot is not None and agent.requested_robot.pos == opposite:
-            self.grid.move_agent(agent.requested_robot, agent.pos)
-            self.grid.move_agent(agent, position)
-            agent.requested_robot = None
-            return True
+        if box.requested_robot is not None and box.requested_robot.pos == opposite:
+            box.requested_robot.stop_finding()
+            self.grid.move_agent(box.requested_robot, box.pos)
+            box.requested_robot = None
+            self.grid.move_agent(box, position)
 
-        if agent.requested_robot is not None:
-            if not teleport_box_robot:
-                print(
-                    f"Waiting for robot {agent.requested_robot.name} to move to {opposite}"
-                )
-                print(f"Current position: {agent.requested_robot.pos}")
-                return False  # wait for the robot to move
-
-            self.grid.move_agent(agent, position)
             return True
 
         robots = self.get_reachable_robots_sorted_by_distance(opposite)
+
+        if box.requested_robot is not None and box.requested_robot not in robots:
+            box.requested_robot.stop_finding()
+            box.requested_robot = None
+
+            return False
+
+        if box.requested_robot is not None:
+            return False  # wait for the robot to move
+
         for robot in robots:
             if robot.pos is None:
                 continue
 
-            if robot.destination is not None:
+            if robot.requester_box is not None:
                 continue
 
-            if teleport_box_robot:
-                self.grid.move_agent(agent, position)
-                return True
-
-            robot.destination = opposite
-            robot.requester_box = agent
-            agent.requested_robot = robot
+            robot.find_box(box, opposite)
+            box.requested_robot = robot
 
             return False
 
@@ -399,31 +425,27 @@ class Sokoban(Model):
         tree, solution_node = self.build_search_tree()
         tree.save_to_files(os.path.join("data", "search_tree", self.algorithm_name))
         if solution_node is None:
-            return
+            print("No solution found")
+            solution_node = tree.get_lowest_cost_node()
 
-        # Asignar los caminos reconstruidos a las cajas
-        box_paths = self.reconstruct_box_paths(solution_node)
-        for box_name, path in box_paths.items():
-            box = self.get_box(box_name)
-            box.path = [
-                move[1] for move in path
-            ]  # Solo necesitamos las posiciones finales
+        solution_path = []
 
-    def reconstruct_box_paths(
-        self, solution_node: TreeNode
-    ) -> dict[str, list[tuple[Coordinate, Coordinate]]]:
-        current_node = solution_node
-        box_paths: dict[str, list[tuple[Coordinate, Coordinate]]] = {}
+        while solution_node is not None:
+            solution_path.insert(0, solution_node)
+            solution_node = solution_node.parent
 
-        while current_node.parent is not None:
-            if current_node.box_move:
-                box_name, start_pos, end_pos = current_node.box_move
-                if box_name not in box_paths:
-                    box_paths[box_name] = []
-                box_paths[box_name].insert(0, (start_pos, end_pos))
-            current_node = current_node.parent
+        for node in solution_path:
+            boxes = node.model.get_boxes()
+            for box in boxes:
+                our_box = self.get_box(box.name)
+                if box.pos is None:
+                    self.grid.place_agent(our_box, node.box_pos)
+                    continue
 
-        return box_paths
+                if our_box.path is None:
+                    our_box.path = []
+
+                our_box.path.append(box.pos)
 
     def get_current_map_structure(self):
         map_structure: dict[str, list[tuple[str, Coordinate]]] = {
@@ -488,38 +510,25 @@ class Sokoban(Model):
             self.heuristic_function_name,
         )
 
-    def get_cost(self) -> int:
+    def get_cost(self) -> float:
         total_cost = 0
 
+        # Cost for boxes to reach the nearest unsolved goal
         for box in self.get_boxes():
             if box.pos is None:
                 continue
 
-            box_cost = 100000000
+            box_cost = float("inf")  # Use infinity instead of a large number
 
-            for goal in self.get_goals():
+            for goal in self.get_unsolved_goals():
                 if goal.pos is None:
                     continue
 
-                box_cost = min(box_cost, self.heuristic_function()(box.pos, goal.pos))
+                path_cost = self.heuristic_function()(box.pos, goal.pos)
+                box_cost = min(box_cost, path_cost)
 
-            total_cost += box_cost
-
-        robots = self.get_robots()
-        for robot in robots:
-            if robot.pos is None:
-                continue
-
-            robot_cost = 100000000
-
-            for goal in self.get_goals():
-                if goal.pos is None:
-                    continue
-
-                robot_cost = min(
-                    robot_cost, self.heuristic_function()(robot.pos, goal.pos)
-                )
-
-            total_cost += robot_cost
+            # Add only if a path to a goal exists
+            if box_cost != float("inf"):
+                total_cost += box_cost
 
         return total_cost

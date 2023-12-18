@@ -27,7 +27,7 @@ class Box(Agent):
 
         next_position = self.path[0]
 
-        if self.model.move_agent(self, next_position):
+        if self.model.move_box(self, next_position):
             self.path.pop(0)
 
     def is_valid_move(self, next_position):

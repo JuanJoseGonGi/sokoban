@@ -28,7 +28,7 @@ server = ModularServer(
         "portrayal_router": portrayal_router,
         "algorithm_name": Choice(
             "Algorithm",
-            "A*",
+            "DFS",
             ["DFS", "BFS", "UCS", "Beam Search", "A*", "Hill Climbing"],
         ),
         "heuristic_function_name": Choice(

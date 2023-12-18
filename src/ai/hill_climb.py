@@ -1,16 +1,18 @@
-from typing import Callable
+from typing import Callable, List, Tuple
 
 
 def hill_climb(
-    origin,
-    destination,
-    heuristic,
-    order: tuple[str, str, str, str],
-    is_valid_move_fn: Callable[[tuple[int, int], tuple[str, str, str, str]], list],
-):
+    origin: Tuple[int, int],
+    destination: Tuple[int, int],
+    heuristic: Callable[[Tuple[int, int], Tuple[int, int]], float],
+    order: Tuple[str, str, str, str],
+    is_valid_move_fn: Callable[
+        [Tuple[int, int], Tuple[str, str, str, str]], List[Tuple[int, int]]
+    ],
+) -> Tuple[List[Tuple[int, int]], List[Tuple[int, int]]]:
     current = origin
-    path = [current]  # Inicializar el camino con la posición de origen
-    visited = [current]  # Utilizar un conjunto para almacenar los nodos visitados
+    path = [current]  # Initialize the path with the origin position
+    visited = [current]
 
     while current != destination:
         neighbors = is_valid_move_fn(current, order)
@@ -19,7 +21,7 @@ def hill_climb(
 
         for neighbor in neighbors:
             if neighbor in visited:
-                continue  # Ignorar los vecinos ya visitados
+                continue  # Skip already visited neighbors
 
             score = heuristic(neighbor, destination)
             if score < next_node_score:
@@ -27,7 +29,7 @@ def hill_climb(
                 next_node = neighbor
 
         if next_node is None:
-            # No hay vecinos prometedores, terminar la búsqueda
+            # No promising neighbors, end the search
             break
         else:
             current = next_node
