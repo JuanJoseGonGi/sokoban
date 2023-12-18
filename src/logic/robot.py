@@ -1,45 +1,49 @@
 from mesa import Agent
-import pickle
+from mesa.space import Coordinate
+
+from typing import Optional
+
+ROBOT_ORDER = ("left", "up", "right", "down")
+
 
 class Robot(Agent):
     def __init__(self, unique_id, model, name: str):
         super().__init__(unique_id, model)
+        self.model = model
         self.name = name
-
-        self.counter = 0
-        self.route = self.path_robot(self.routes())
+        self.destination: Optional[Coordinate] = None
+        self.pos: Optional[Coordinate] = None
+        self.requester_box: Optional[Agent] = None
 
     def step(self):
-        try:
-            position_xy = self.route[self.counter]
-            self.model.grid.move_agent(self,position_xy )
-            print("steprobot",self.route)
-            self.counter += 1
-        except:
-            print("no more steps, the goal was reached or all the route was traversed")
+        self.move()
 
-    def routes(self):
-        #the path of the box
-        with open('src/data/path.pkl', 'rb') as f:
-            return pickle.load(f)
+    def move(self):
+        if self.destination is None:
+            return
 
-    def path_robot(self,routeBox):
-        path = []
-        for i in range(len(routeBox)):
-            if i+1 == len(routeBox):
-                break
-            path.append(self.determine_movement(routeBox[i],routeBox[i+1]))
-        return path
+        if self.pos == self.destination:
+            self.destination = None
+            self.requester_box = None
+            return
 
-    #given the x,y of 2 coordinates of the box, it returns the position of the robot
-    #coord1 tuple[int, int], coord2 tuple[int, int]
-    def determine_movement(self,coord1, coord2):
+        _, path = self.model.get_path(
+            self.pos,
+            self.destination,
+            ROBOT_ORDER,
+            self.model.get_valid_move_neighbors,
+        )
 
-        if(coord2[0]>coord1[0] and coord2[1] == coord1[1]):#derecha
-            return coord1
-        elif(coord2[0]<coord1[0] and coord2[1] == coord1[1]):#izquierda
-            return coord2
-        elif(coord2[0] == coord1[0] and coord2[1] > coord1[1]):#arriba
-            return coord1
-        elif(coord2[0] == coord1[0] and coord2[1] < coord1[1]):#abajo
-            return coord2
+        next_position = path.pop(0)
+        while len(path) > 0 and self.pos == next_position:
+            next_position = path.pop(0)
+
+        if next_position != self.pos:
+            self.model.move_agent(self, next_position)
+            return
+
+        self.destination = None
+        self.requester_box = None
+
+    def is_valid_move(self, next_position):
+        return self.model.is_valid_robot_position(next_position)

@@ -1,33 +1,30 @@
 from collections import deque
+from typing import Union, Callable
 
-from typing import Union
 
-
-def bfs(model, origin: tuple[int, int], destination: tuple[int, int]):
-    """Iterative implementation of BFS.
-
-    It receives a model, an origin, and a destination, and returns a list
-    of visited positions and a list that forms a path from the
-    origin to the destination.
-    """
-    visited_positions = []
+def bfs(
+    origin: tuple[int, int],
+    destination: tuple[int, int],
+    order: tuple[str, str, str, str],
+    is_valid_move_fn: Callable[[tuple[int, int], tuple[str, str, str, str]], list],
+):
+    visited_positions = [origin]
     queue = deque([origin])
     came_from: dict[tuple[int, int], Union[tuple[int, int], None]] = {origin: None}
+    path = []
 
     while queue:
         current = queue.popleft()
-        visited_positions.append(current)
-
         if current == destination:
-            path = []
             while current:
                 path.append(current)
                 current = came_from[current]
-            return list(visited_positions), path[::-1]
+            return visited_positions, path[::-1]
 
-        for neighbor in model.get_valid_move_neighbors(current):
-            if neighbor not in visited_positions and neighbor not in queue:
+        for neighbor in is_valid_move_fn(current, order):
+            if neighbor not in visited_positions:
                 queue.append(neighbor)
+                visited_positions.append(neighbor)
                 came_from[neighbor] = current
-    #print(path)
+
     return visited_positions, path

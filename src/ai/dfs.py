@@ -1,4 +1,12 @@
-def dfs(model, origin: tuple[int, int], destination: tuple[int, int]):
+from typing import Callable
+
+
+def dfs(
+    origin: tuple[int, int],
+    destination: tuple[int, int],
+    order: tuple[str, str, str, str],
+    is_valid_move_fn: Callable[[tuple[int, int], tuple[str, str, str, str]], list],
+):
     visited_positions = []
     path = []
 
@@ -11,7 +19,7 @@ def dfs(model, origin: tuple[int, int], destination: tuple[int, int]):
             path.append(current)
             return True
 
-        for neighbor in model.get_valid_move_neighbors(current):
+        for neighbor in is_valid_move_fn(current, order):
             if dfs_recursive(neighbor):
                 path.append(current)
                 return True
@@ -19,6 +27,9 @@ def dfs(model, origin: tuple[int, int], destination: tuple[int, int]):
         return False
 
     dfs_recursive(origin)
+
+    if len(path) == 0:
+        return visited_positions, []
 
     # Calcular la columna más repetida en el path
     col_count: dict[int, int] = {}

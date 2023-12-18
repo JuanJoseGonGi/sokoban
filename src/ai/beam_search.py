@@ -1,13 +1,14 @@
-from typing import Callable, List, Tuple, Optional
+from typing import Callable, List, Tuple
 
 
 def beam_search(
-    model,
     heuristic: Callable[[Tuple[int, int], Tuple[int, int]], float],
     beam_width: int,
     origin: Tuple[int, int],
     destination: Tuple[int, int],
-) -> Tuple[List[Tuple[int, int]], Optional[List[Tuple[int, int]]]]:
+    order: Tuple[str, str, str, str],
+    is_valid_move_fn: Callable[[tuple[int, int], tuple[str, str, str, str]], list],
+) -> Tuple[List[Tuple[int, int]], List[Tuple[int, int]]]:
     # Initialize the beam with the origin position
     beam = [(origin, [origin])]
 
@@ -21,7 +22,7 @@ def beam_search(
             if position == destination:
                 return visited_positions, path
 
-            valid_neighbors = model.get_valid_move_neighbors(position)
+            valid_neighbors = is_valid_move_fn(position, order)
 
             for new_position in valid_neighbors:
                 if new_position not in visited_positions:
@@ -32,5 +33,4 @@ def beam_search(
         new_beam.sort(key=lambda x: heuristic(x[0], destination))
         beam = new_beam[:beam_width]
 
-    # If the destination is not reached, return None for the path
-    return visited_positions, None
+    return visited_positions, []

@@ -1,6 +1,6 @@
 import mesa
 from mesa.visualization.ModularVisualization import ModularServer
-from mesa.visualization.UserParam import Choice, NumberInput
+from mesa.visualization.UserParam import Choice
 from os import path
 
 from src.ui.visualization.portrayal_router import PortrayalRouter
@@ -9,10 +9,10 @@ from src.data.map_loader import MapLoader
 
 loader = MapLoader()
 map_structure, width, height = loader.get_map_structure(
-    path.join(path.dirname(__file__), "data/samples/map3.txt")
+    path.join(path.dirname(__file__), "data/samples/map4.txt")
 )
 
-portrayal_router = PortrayalRouter()
+portrayal_router = PortrayalRouter(show_path=False)
 grid = mesa.visualization.CanvasGrid(
     portrayal_router.get_portrayal, width, height, width * 50, height * 50
 )
@@ -21,13 +21,14 @@ server = ModularServer(
     [grid],
     "Sokoban",
     {
+        "map_loader": loader,
         "map_structure": map_structure,
         "width": width,
         "height": height,
         "portrayal_router": portrayal_router,
         "algorithm_name": Choice(
             "Algorithm",
-            "UCS",
+            "A*",
             ["DFS", "BFS", "UCS", "Beam Search", "A*", "Hill Climbing"],
         ),
         "heuristic_function_name": Choice(
@@ -35,10 +36,7 @@ server = ModularServer(
             "Manhattan Distance",
             ["Manhattan Distance", "Euclidean Distance"],
         ),
-        "origin_0": NumberInput("Origin X", 2),
-        "origin_1": NumberInput("Origin Y", 4),
-        "destination_0": NumberInput("Destination X", 6),
-        "destination_1": NumberInput("Destination Y", 5),
+        "find_solution_on_init": True,
     },
 )
 

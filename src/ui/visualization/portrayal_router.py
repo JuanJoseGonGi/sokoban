@@ -10,12 +10,15 @@ from src.logic.rock import Rock
 
 
 class PortrayalRouter:
-    def __init__(self, search_path: list[tuple[int, int]] = []):
+    def __init__(
+        self, search_path: list[tuple[int, int]] = [], show_path: bool = False
+    ):
         self.search_path = search_path
+        self.show_path = show_path
 
     def get_portrayal(self, agent: Agent):
         text = ""
-        if agent.pos in self.search_path:
+        if self.show_path and agent.pos in self.search_path:
             text = self.search_path.index(agent.pos)
 
         portrayal = {"text": text, "text_color": "#000000", "Color": "#000000"}
@@ -69,6 +72,9 @@ class PortrayalRouter:
         return {
             "Shape": path.join(path.dirname(__file__), "images/robot.png"),
             "Layer": 1,
+            "text": robot.name,
+            "text_color": "#FFFFFF",
+            "Color": "#FFFFFF",
         }
 
     def get_rock_portrayal(self, rock: Rock):

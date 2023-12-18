@@ -1,7 +1,15 @@
 import heapq
 
+from typing import Callable
 
-def a_star(model, origin, destination, heuristic):
+
+def a_star(
+    origin,
+    destination,
+    heuristic,
+    order,
+    is_valid_move_fn: Callable[[tuple[int, int], tuple[str, str, str, str]], list],
+):
     def reconstruct_path(came_from, current):
         path = [current]
         while current in came_from:
@@ -26,7 +34,7 @@ def a_star(model, origin, destination, heuristic):
         if current == destination:
             return visited, reconstruct_path(came_from, current)
 
-        for neighbor in model.get_valid_move_neighbors(current):
+        for neighbor in is_valid_move_fn(current, order):
             tentative_g_score = g_score[current] + 1
             if tentative_g_score < g_score.get(neighbor, float("inf")):
                 came_from[neighbor] = current

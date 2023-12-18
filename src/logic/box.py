@@ -1,22 +1,34 @@
 from mesa import Agent
-import pickle
+from mesa.space import Coordinate
+
+from src.logic.robot import Robot
+
+from typing import Optional
+
 
 class Box(Agent):
     def __init__(self, unique_id, model, name: str):
         super().__init__(unique_id, model)
+        self.model = model
         self.name = name
-        self.counter = 1
-        self.route = self.routes()
+        self.path = []
+        self.requested_robot: Optional[Robot] = None
+        self.pos: Optional[Coordinate] = None
 
-    def step(self):
-        try:
-            position_xy = self.route[self.counter]
-            self.model.grid.move_agent(self,position_xy )
-            #print("stepbox",)
-            self.counter += 1
-        except:
-            print("no more steps, the goal was reached or all the route was traversed")
+    def step(self) -> None:
+        if len(self.path) > 0:
+            self.move()
 
-    def routes(self):
-        with open('src/data/path.pkl', 'rb') as f:
-            return pickle.load(f)
+        return None
+
+    def move(self):
+        if len(self.path) < 1:
+            return
+
+        next_position = self.path[0]
+
+        if self.model.move_agent(self, next_position):
+            self.path.pop(0)
+
+    def is_valid_move(self, next_position):
+        return self.model.is_valid_box_position(next_position)

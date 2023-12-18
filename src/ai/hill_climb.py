@@ -1,10 +1,19 @@
-def hill_climb(model, origin, destination, heuristic):
+from typing import Callable
+
+
+def hill_climb(
+    origin,
+    destination,
+    heuristic,
+    order: tuple[str, str, str, str],
+    is_valid_move_fn: Callable[[tuple[int, int], tuple[str, str, str, str]], list],
+):
     current = origin
     path = [current]  # Inicializar el camino con la posición de origen
     visited = [current]  # Utilizar un conjunto para almacenar los nodos visitados
 
     while current != destination:
-        neighbors = model.get_valid_move_neighbors(current)
+        neighbors = is_valid_move_fn(current, order)
         next_node = None
         next_node_score = float("inf")
 
